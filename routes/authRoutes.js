@@ -2,13 +2,13 @@ import {Router} from "express";
 import {
     activateController,
     loginController,
-    logoutController,
+    logoutController, refreshController,
     registrationController
 } from "../controllers/AuthController.js";
 
 const router = new Router()
 
-// router.get('/refresh', refreshController)
+router.get('/refresh', refreshController)
 router.get('/activate/:link', activateController)
 
 router.post('/registration', registrationController)

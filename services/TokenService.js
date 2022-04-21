@@ -19,12 +19,11 @@ export const saveToken = async (userId, refreshToken) => {
     return token
 }
 export const removeToken = async (refreshToken) => {
-    const token = await TokenSchema.deleteOne(refreshToken)
-    console.log('deleted')
+    const token = await TokenSchema.deleteOne({refreshToken})
     return token
 }
 export const findToken = async (refreshToken) => {
-    const token = await TokenSchema.findOne(refreshToken)
+    const token = await TokenSchema.findOne({refreshToken})
     return token
 }
 export const validateAccessToken = async (token) => {
@@ -38,7 +37,7 @@ export const validateAccessToken = async (token) => {
 
 export const validateRefreshToken = async (token) => {
     try {
-        const user = await jwt.verify(token.refreshToken, process.env.JWT_REFRESH)
+        const user = await jwt.verify(token, process.env.JWT_REFRESH)
         return user
     } catch (e) {
         return null

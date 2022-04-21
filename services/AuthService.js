@@ -1,5 +1,5 @@
 import bcrypt from "bcrypt";
-import {generateToken, removeToken, saveToken} from './TokenService.js'
+import {findToken, generateToken, removeToken, saveToken, validateRefreshToken} from './TokenService.js'
 import UserSchema from "../models/User.js";
 import {sendActivationMail} from "./MailService.js";
 
@@ -29,7 +29,16 @@ export const loginService = async (email, password) => {
     if (!user) throw new Error('Користувача не знайдено')
     const comparePass = await bcrypt.compare(password, user.password)
     if (!comparePass) throw new Error('Ви ввели хибний пароль')
-    const tokens = await generateToken({...user})
+    const userData = {
+        _id: user._id,
+        email: user.email,
+        username: user.username,
+        first_name: user.first_name,
+        second_name: user.second_name,
+        phone: user.phone,
+        birthday: user.birthday
+    }
+    const tokens = await generateToken(userData)
     await saveToken(user.id, tokens.refreshToken)
     return {
         ...tokens,
@@ -48,4 +57,28 @@ export const activateService = async (activationLink) => {
     const user = await UserSchema.findOneAndUpdate({activationLink},{"roles.isActivated": true}, {new:true})
     if (!user) throw new Error('Посилання не дійсне')
     await user.save
+}
+export const refreshService = async (refreshToken) => {
+    if (!refreshToken) throw new Error('Токен не існує')
+    const userData = await validateRefreshToken(refreshToken)
+    const tokenDB = await findToken(refreshToken)
+    if (!userData || !tokenDB) throw new Error('Помилка авторизації')
+    const user = await UserSchema.findOne({_id: userData._id})
+    const userHash = {
+        _id: user._id,
+        email: user.email,
+        username: user.username,
+        first_name: user.first_name,
+        second_name: user.second_name,
+        phone: user.phone,
+        birthday: user.birthday
+    }
+
+    const tokens = await generateToken(userHash)
+    await saveToken(user.id, tokens.refreshToken)
+
+    return {
+        ...tokens,
+        user
+    }
 }

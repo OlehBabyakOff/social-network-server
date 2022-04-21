@@ -9,6 +9,7 @@ import fileUpload from 'express-fileupload'
 import 'dotenv/config'
 
 import authRoutes from "./routes/authRoutes.js";
+import postRoutes from "./routes/postRoutes.js";
 
 const app = express()
 
@@ -21,7 +22,7 @@ app.use(fileUpload())
 app.use(cookieParser())
 app.use(bodyParser.json())
 
-app.use('/api', authRoutes)
+app.use('/api', authRoutes, postRoutes)
 
 const server = http.createServer(app)
 const io = new Server(server, {
