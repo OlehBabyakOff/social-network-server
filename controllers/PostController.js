@@ -100,8 +100,8 @@ export const likeCommentController = async (req, res) => {
         const commentId = req.params.commentId
         const {refreshToken} = req.cookies
         const like = await likeCommentService(commentId, refreshToken)
-        return res.json(like)
+        return res.status(200).json(like)
     } catch (e) {
-        console.log(e)
+        res.status(400).json(e.message)
     }
 }

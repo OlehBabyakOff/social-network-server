@@ -10,6 +10,7 @@ import 'dotenv/config'
 
 import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 
 const app = express()
 
@@ -22,7 +23,7 @@ app.use(fileUpload())
 app.use(cookieParser())
 app.use(bodyParser.json())
 
-app.use('/api', authRoutes, postRoutes)
+app.use('/api', authRoutes, postRoutes, userRoutes)
 
 const server = http.createServer(app)
 const io = new Server(server, {
