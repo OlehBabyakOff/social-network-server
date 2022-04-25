@@ -5,6 +5,7 @@ import {
     getFollowingsController, getReportsController,
     getUserController, receiveMessageController, sendMessageController, sendReportController
 } from "../controllers/UserController.js";
+import {isActivate, isAdmin, isAuth, isBlocked} from "../middleware/authMiddleware.js";
 
 const router = new Router()
 

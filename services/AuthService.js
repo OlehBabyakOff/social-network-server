@@ -36,7 +36,8 @@ export const loginService = async (email, password) => {
         first_name: user.first_name,
         second_name: user.second_name,
         phone: user.phone,
-        birthday: user.birthday
+        birthday: user.birthday,
+        roles: user.roles
     }
     const tokens = await generateToken(userData)
     await saveToken(user.id, tokens.refreshToken)
@@ -71,7 +72,8 @@ export const refreshService = async (refreshToken) => {
         first_name: user.first_name,
         second_name: user.second_name,
         phone: user.phone,
-        birthday: user.birthday
+        birthday: user.birthday,
+        roles: user.roles
     }
 
     const tokens = await generateToken(userHash)

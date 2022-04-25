@@ -4,6 +4,8 @@ import GroupPostsSchema from "../models/GroupPost.js";
 import GroupCommentSchema from "../models/GroupComment.js";
 import GroupPostLikesSchema from '../models/GroupPostLikes.js';
 import GroupCommentLikesSchema from '../models/GroupCommentLikes.js';
+import UserSchema from "../models/User.js";
+import GroupConversationSchema from "../models/GroupConversation.js";
 import {validateRefreshToken} from "./TokenService.js";
 
 export const createGroupService = async (title, refreshToken, avatar, background) => {
@@ -18,6 +20,28 @@ export const createGroupService = async (title, refreshToken, avatar, background
     return {
         group,
         admin
+    }
+}
+export const setAdminService = async (groupId, userId, refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const group = await GroupSchema.findById(groupId)
+    if (!group) throw new Error('Спільноту не знайдено')
+    const user = await UserSchema.findById(userId)
+    if (!user) throw new Error('Користувача не знайдено')
+    if (userData._id === group.creatorId.toString()) {
+        group.admins.forEach(admin => {
+            if (admin.adminId.toString() !== userId.toString()) {
+                group.admins.push({adminId: userId})
+            } else {
+                throw new Error('Користувач вже має права адміністратора')
+            }
+        })
+        await group.save()
+        return {message: "Права користувача змінено"}
+    } else {
+        throw new Error('Ви не маєте права назначати адміністраторів спільноти')
     }
 }
 export const followGroupService = async (refreshToken, groupId) => {
@@ -160,4 +184,46 @@ export const getCommentsService = async (groupId, postId) => {
     if (!post) throw new Error('Пост не знайдено')
     const comments = await GroupCommentSchema.find({groupId, postId: post._id})
     return comments
+}
+export const sendGroupMessageService = async (refreshToken, groupId, text, image) => {
+    if (!text) throw new Error('Поле не може бути порожнім')
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const group = await GroupSchema.findById(groupId)
+    if (!group) throw new Error('Спільноту не знайдено')
+    const conversation = await GroupConversationSchema.findOne({groupId})
+    if (conversation) {
+        if (image) {
+            conversation.messages.push({text:text, image:image, sender:userData._id})
+            await conversation.save()
+            return conversation
+        } else {
+            conversation.messages.push({text:text, sender:userData._id})
+            await conversation.save()
+            return conversation
+        }
+    } else {
+        if (image) {
+            const newConversation = await GroupConversationSchema.create({groupId})
+            newConversation.messages.push({text:text, image: image, sender:userData._id})
+            await newConversation.save()
+            return newConversation
+        } else {
+            const newConversation = await GroupConversationSchema.create({groupId})
+            newConversation.messages.push({text:text, sender:userData._id})
+            await newConversation.save()
+            return newConversation
+        }
+    }
+}
+export const receiveGroupMessagesService = async (refreshToken, groupId) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const group = await GroupSchema.findById(groupId)
+    if (!group) throw new Error('Спільноту не знайдено')
+    const groupConversation = await GroupConversationSchema.findOne({groupId})
+    if (!groupConversation) throw new Error('Такого чату не існує')
+    return groupConversation
 }

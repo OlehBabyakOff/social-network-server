@@ -9,7 +9,7 @@ import {
     getOnePostService,
     getPostsService,
     likeGroupCommentService,
-    likeGroupPostService
+    likeGroupPostService, receiveGroupMessagesService, sendGroupMessageService, setAdminService
 } from "../services/GroupService.js";
 
 export const createGroupController = async (req, res) => {
@@ -20,6 +20,17 @@ export const createGroupController = async (req, res) => {
         const background = req.files.background
         const group = await createGroupService(title, refreshToken, avatar, background)
         return res.status(200).json(group)
+    } catch (e) {
+        return res.status(400).json(e.message)
+    }
+}
+export const setAdminController = async (req, res) => {
+    try {
+        const groupId = req.params.id
+        const userId = req.params.userId
+        const {refreshToken} = req.cookies
+        const admin = await setAdminService(groupId, userId, refreshToken)
+        return res.status(200).json(admin)
     } catch (e) {
         return res.status(400).json(e.message)
     }
@@ -139,5 +150,27 @@ export const getCommentsController = async (req, res) => {
         return res.status(200).json(comments)
     } catch (e) {
         return res.status(400).json(e.message)
+    }
+}
+export const sendGroupMessageController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const groupId = req.params.id
+        const {text} = req.body
+        const image = req?.files?.image
+        const groupConversation = await sendGroupMessageService(refreshToken, groupId, text, image)
+        return res.status(200).json(groupConversation)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const receiveGroupMessagesController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const groupId = req.params.id
+        const groupConversation = await receiveGroupMessagesService(refreshToken, groupId)
+        return res.status(200).json(groupConversation)
+    } catch (e) {
+        res.status(400).json(e.message)
     }
 }
