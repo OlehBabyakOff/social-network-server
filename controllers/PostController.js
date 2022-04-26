@@ -2,8 +2,8 @@ import {
     createChildCommentService,
     createCommentService,
     createPostService, getAllCommentsService,
-    getAllPostsService, getChildCommentsService,
-    getOnePostService, getParentCommentsService, likeCommentService, likePostService
+    getAllPostsService, getChildCommentsService, getMyPostsService,
+    getOnePostService, getParentCommentsService, getPostLikeService, likeCommentService, likePostService
 } from "../services/PostService.js";
 
 export const createPostController = async (req, res) => {
@@ -11,7 +11,7 @@ export const createPostController = async (req, res) => {
         const {refreshToken} = req.cookies
         const {text} = req.body
         const image = req?.files?.image
-        const post = await createPostService(refreshToken, text, image)
+        const post = await createPostService(refreshToken, text, image?.data)
         return res.status(201).json({post, message: "Пост успішно створено"})
     } catch (e) {
         res.status(400).json(e.message)
@@ -20,6 +20,15 @@ export const createPostController = async (req, res) => {
 export const getAllPostsController = async (req, res) => {
     try {
         const posts = await getAllPostsService()
+        return res.status(201).json(posts)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const getMyPostsController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const posts = await getMyPostsService(refreshToken)
         return res.status(201).json(posts)
     } catch (e) {
         res.status(400).json(e.message)
@@ -100,6 +109,16 @@ export const likeCommentController = async (req, res) => {
         const commentId = req.params.commentId
         const {refreshToken} = req.cookies
         const like = await likeCommentService(commentId, refreshToken)
+        return res.status(200).json(like)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const getPostLikeController = async (req, res) => {
+    try {
+         const postId = req.params.id
+        const {refreshToken} = req.cookies
+        const like = await getPostLikeService(postId, refreshToken)
         return res.status(200).json(like)
     } catch (e) {
         res.status(400).json(e.message)

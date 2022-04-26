@@ -3,7 +3,7 @@ import {
     followToUserController,
     getFollowersController,
     getFollowingsController, getReportsController,
-    getUserController, receiveMessageController, sendMessageController, sendReportController
+    getUserController, getUsersController, receiveMessageController, sendMessageController, sendReportController
 } from "../controllers/UserController.js";
 import {isActivate, isAdmin, isAuth, isBlocked} from "../middleware/authMiddleware.js";
 
@@ -13,6 +13,7 @@ router.post('/user/:id/follow', followToUserController)
 router.post('/user/:id/messages/send', sendMessageController)
 router.post('/user/:id/report', sendReportController)
 
+router.get('/users', getUsersController)
 router.get('/user/:id', getUserController)
 router.get('/user/:id/followers', getFollowersController)
 router.get('/user/:id/followings', getFollowingsController)

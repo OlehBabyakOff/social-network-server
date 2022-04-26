@@ -9,11 +9,24 @@ export const createPostService = async (refreshToken, text, image) => {
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
     const userData = await validateRefreshToken(refreshToken)
     if (!userData) throw new Error('Користувача не знайдено')
-    const post = await PostSchema.create({user: userData._id, text, image})
+    const post = await PostSchema.create({user: userData._id, text})
+    if (image) {
+        await PostSchema.updateOne({_id: post._id}, {
+            image
+        })
+    }
     return post
 }
 export const getAllPostsService = async () => {
-    const posts = await PostSchema.find()
+    const posts = await PostSchema.find().sort({_id: -1})
+    if (!posts) throw new Error('Список постів порожній')
+    return posts
+}
+export const getMyPostsService = async (refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken)
+    if (!userData) throw new Error('Користувача не знайдено')
+    const posts = await PostSchema.find({userId: userData._id}).sort({_id: -1})
     if (!posts) throw new Error('Список постів порожній')
     return posts
 }
@@ -28,7 +41,7 @@ export const createCommentService = async (id, refreshToken, content) => {
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
     const userData = await validateRefreshToken(refreshToken);
     if (!userData) throw new Error('Користувача не знайдено')
-    const comment = await CommentSchema.create({postId: post._id, userId: userData._id, content})
+    const comment = await CommentSchema.create({postId: post._id, userId: userData._id, content, createdAt: new Date()})
     post.comments += 1
     await post.save()
     return comment
@@ -41,7 +54,7 @@ export const createChildCommentService = async (id, refreshToken, parentId, cont
     if (!userData) throw new Error('Користувача не знайдено')
     const parent = await CommentSchema.findById(parentId)
     if (!parent) throw new Error('Коментар не знайдено')
-    const comment = await CommentSchema.create({postId: post._id, userId: userData._id, parentId: parent._id, content})
+    const comment = await CommentSchema.create({postId: post._id, userId: userData._id, parentId: parent._id, content, createdAt: new Date()})
     parent.childs.push(comment._id)
     await parent.save()
     post.comments += 1
@@ -58,7 +71,7 @@ export const getAllCommentsService = async (id) => {
 export const getParentCommentsService = async (id) => {
     const post = await PostSchema.findOne({_id: id})
     if (!post) throw new Error('Пост не знайдено')
-    const comments = await CommentSchema.find({postId:post._id, parentId: {$exists:false}})
+    const comments = await CommentSchema.find({postId:post._id, parentId: {$exists:false}}).sort({_id: -1})
     if (!comments) throw new Error('Коментарі не знайдено')
     return comments
 }
@@ -110,4 +123,11 @@ export const likeCommentService = async (commentId, refreshToken) => {
         await comment.save()
         return like
     }
+}
+export const getPostLikeService = async (postId, refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const like = await PostLikeSchema.findOne({postId, userId: userData._id})
+    return like
 }

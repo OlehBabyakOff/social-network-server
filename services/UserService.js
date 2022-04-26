@@ -9,6 +9,11 @@ export const getUserService = async (userId) => {
     if (!user) throw new Error('Користувача не знайдено')
     return user
 }
+export const getUsersService = async () => {
+    const users = await UserSchema.find()
+    if (!users) throw new Error('Користувачів не знайдено')
+    return users
+}
 // follow
 export const followToUserService = async (followedId, refreshToken) => {
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')

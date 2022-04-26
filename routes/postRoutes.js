@@ -4,8 +4,8 @@ import {
     createCommentController,
     createPostController,
     getAllCommentsController,
-    getAllPostsController, getChildCommentsController,
-    getOnePostController, getParentCommentsController,
+    getAllPostsController, getChildCommentsController, getMyPostsController,
+    getOnePostController, getParentCommentsController, getPostLikeController,
     likeCommentController,
     likePostController
 } from "../controllers/PostController.js";
@@ -21,7 +21,10 @@ router.post('/:id/like', likePostController)
 router.post('/:id/comment/:commentId/like', likeCommentController)
 
 router.get('/post/get', getAllPostsController)
+router.get('/post/getMy', getMyPostsController)
 router.get('/post/get/:id', getOnePostController)
+
+router.get('/:id/like/get', getPostLikeController)
 
 router.get('/:id/comments/get', getAllCommentsController)
 router.get('/:id/comments/get/parent', getParentCommentsController)

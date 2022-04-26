@@ -2,13 +2,21 @@ import {
     followToUserService,
     getFollowersService,
     getFollowingsService, getReportsService,
-    getUserService, receiveMessageService, sendMessageService, sendReportService
+    getUserService, getUsersService, receiveMessageService, sendMessageService, sendReportService
 } from "../services/UserService.js";
 
 export const getUserController = async (req, res) => {
     try {
         const userId = req.params.id
         const user = await getUserService(userId)
+        return res.status(200).json(user)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const getUsersController = async (req, res) => {
+    try {
+        const user = await getUsersService()
         return res.status(200).json(user)
     } catch (e) {
         res.status(400).json(e.message)
