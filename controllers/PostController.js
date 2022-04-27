@@ -1,17 +1,27 @@
 import {
     createChildCommentService,
     createCommentService,
-    createPostService, getAllCommentsService,
-    getAllPostsService, getChildCommentsService, getMyPostsService,
-    getOnePostService, getParentCommentsService, getPostLikeService, likeCommentService, likePostService
+    createPostService,
+    deleteCommentService,
+    deletePostService,
+    getAllCommentsService,
+    getAllPostsService,
+    getChildCommentsService,
+    getMyPostsService,
+    getOnePostService,
+    getParentCommentsService,
+    getPostLikeService,
+    getUserPostsService,
+    likeCommentService,
+    likePostService
 } from "../services/PostService.js";
 
 export const createPostController = async (req, res) => {
     try {
         const {refreshToken} = req.cookies
-        const {text} = req.body
+        const {text, location} = req.body
         const image = req?.files?.image
-        const post = await createPostService(refreshToken, text, image?.data)
+        const post = await createPostService(refreshToken, text, location, image?.data)
         return res.status(201).json({post, message: "Пост успішно створено"})
     } catch (e) {
         res.status(400).json(e.message)
@@ -29,6 +39,15 @@ export const getMyPostsController = async (req, res) => {
     try {
         const {refreshToken} = req.cookies
         const posts = await getMyPostsService(refreshToken)
+        return res.status(201).json(posts)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const getUserPostsController = async (req, res) => {
+    try {
+        const id = req.params.id
+        const posts = await getUserPostsService(id)
         return res.status(201).json(posts)
     } catch (e) {
         res.status(400).json(e.message)
@@ -120,6 +139,27 @@ export const getPostLikeController = async (req, res) => {
         const {refreshToken} = req.cookies
         const like = await getPostLikeService(postId, refreshToken)
         return res.status(200).json(like)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const deletePostController = async (req, res) => {
+    try {
+        const postId = req.params.id
+        const {refreshToken} = req.cookies
+        const post = await deletePostService(postId, refreshToken)
+        return res.status(200).json(post)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const deleteCommentController = async (req, res) => {
+    try {
+        const postId = req.params.id
+        const commentId = req.params.commentId
+        const {refreshToken} = req.cookies
+        const post = await deleteCommentService(postId, commentId, refreshToken)
+        return res.status(200).json(post)
     } catch (e) {
         res.status(400).json(e.message)
     }

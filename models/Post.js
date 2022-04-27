@@ -7,6 +7,7 @@ const PostSchema = new Schema({
     text:{type:String, require: true},
     image:{data: Buffer,
         contentType: String},
+    location:{type:String},
     likes:{type:Number, default:0},
     comments:{type:Number, default:0},
     createdAt:{type:Date, default:new Date()}

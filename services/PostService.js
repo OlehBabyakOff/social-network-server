@@ -4,7 +4,7 @@ import CommentSchema from "../models/Comment.js";
 import PostLikeSchema from "../models/PostLikes.js";
 import CommentLikeSchema from "../models/CommentLikes.js";
 
-export const createPostService = async (refreshToken, text, image) => {
+export const createPostService = async (refreshToken, text, location, image) => {
     if (!text) throw new Error('Пост повинен містити текст')
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
     const userData = await validateRefreshToken(refreshToken)
@@ -13,6 +13,11 @@ export const createPostService = async (refreshToken, text, image) => {
     if (image) {
         await PostSchema.updateOne({_id: post._id}, {
             image
+        })
+    }
+    if (location) {
+        await PostSchema.updateOne({_id: post._id}, {
+            location
         })
     }
     return post
@@ -26,7 +31,12 @@ export const getMyPostsService = async (refreshToken) => {
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
     const userData = await validateRefreshToken(refreshToken)
     if (!userData) throw new Error('Користувача не знайдено')
-    const posts = await PostSchema.find({userId: userData._id}).sort({_id: -1})
+    const posts = await PostSchema.find({user: userData._id}).sort({_id: -1})
+    if (!posts) throw new Error('Список постів порожній')
+    return posts
+}
+export const getUserPostsService = async (id) => {
+    const posts = await PostSchema.find({user: id}).sort({_id: -1})
     if (!posts) throw new Error('Список постів порожній')
     return posts
 }
@@ -130,4 +140,38 @@ export const getPostLikeService = async (postId, refreshToken) => {
     if (!userData) throw new Error('Користувача не знайдено')
     const like = await PostLikeSchema.findOne({postId, userId: userData._id})
     return like
+}
+export const deletePostService = async (postId, refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const post = await PostSchema.findById(postId)
+    if (!post) throw new Error('Пост не знайдено')
+    if (post.user.toString() === userData._id.toString() || userData.roles.isAdmin) {
+        await PostSchema.findOneAndDelete({_id: postId})
+        await CommentSchema.deleteMany({postId})
+        await PostLikeSchema.deleteMany({postId})
+        return {message: 'Пост успішно видалено'}
+    } else {
+        throw new Error('Ви не можете видалити чужий пост')
+    }
+}
+export const deleteCommentService = async (postId, commentId, refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const post = await PostSchema.findById(postId)
+    if (!post) throw new Error('Пост не знайдено')
+    const comment = await CommentSchema.findById(commentId)
+    if (!comment) throw new Error('Коментар не знайдено')
+    if (comment.userId.toString() === userData._id.toString() || userData.roles.isAdmin) {
+        await CommentSchema.findOneAndDelete({_id: commentId})
+        const deletedComments = await CommentSchema.deleteMany({parentId: commentId})
+        await PostSchema.findOneAndUpdate({_id: postId}, {
+            comments: post.comments - 1 - deletedComments.deletedCount
+        })
+        return {message: 'Коментар успішно видалено'}
+    } else {
+        throw new Error('Ви не можете видалити чужий коментар')
+    }
 }
