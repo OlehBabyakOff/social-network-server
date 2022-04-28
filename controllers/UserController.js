@@ -1,7 +1,7 @@
 import {
     followToUserService,
     getFollowersService,
-    getFollowingsService, getReportsService,
+    getFollowingsService, getLimitedUsersService, getReportsService,
     getUserService, getUsersService, receiveMessageService, sendMessageService, sendReportService
 } from "../services/UserService.js";
 
@@ -18,6 +18,15 @@ export const getUsersController = async (req, res) => {
     try {
         const user = await getUsersService()
         return res.status(200).json(user)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const getLimitedUsersController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const users = await getLimitedUsersService(refreshToken)
+        return res.status(200).json(users)
     } catch (e) {
         res.status(400).json(e.message)
     }

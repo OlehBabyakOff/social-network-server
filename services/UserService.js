@@ -14,6 +14,15 @@ export const getUsersService = async () => {
     if (!users) throw new Error('Користувачів не знайдено')
     return users
 }
+export const getLimitedUsersService = async (refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+
+    const users = await UserSchema.find({_id: {$ne: userData._id}}).limit(5).sort({_id: -1})
+    if (!users) throw new Error('Користувачів не знайдено')
+    return users
+}
 // follow
 export const followToUserService = async (followedId, refreshToken) => {
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
