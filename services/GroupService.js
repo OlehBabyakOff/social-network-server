@@ -13,7 +13,11 @@ export const createGroupService = async (title, refreshToken, avatar, background
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
     const userData = await validateRefreshToken(refreshToken);
     if (!userData) throw new Error('Користувача не знайдено')
-    const group = await GroupSchema.create({title, creatorId:userData._id, avatar: avatar, background: background})
+    const group = await GroupSchema.create({title, creatorId:userData._id})
+    await GroupSchema.updateOne({_id: group._id}, {
+        avatar,
+        background
+    })
     group.admins.push({adminId: userData._id})
     await group.save()
     const admin = await GroupMembersSchema.create({groupId:group._id, memberId:group.creatorId})
@@ -70,6 +74,27 @@ export const createGroupPostService = async (groupId, refreshToken, text, image)
     if (group.creatorId != userData._id) throw new Error('Ви не маєте права для створення нового поста')
     const groupPost = await GroupPostsSchema.create({groupId, userId: userData._id, text, image})
     return groupPost
+}
+export const getAllGroupsService = async () => {
+    const groups = await GroupSchema.find()
+    if (!groups) throw new Error('Спільноту не знайдено')
+    return groups
+}
+export const getMyGroupsService = async (refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const groups = await GroupSchema.find()
+    const myGroups = []
+    for (const group of groups) {
+        const groupMemberCheck = await GroupMembersSchema.findOne({groupId: group._id, memberId: userData._id})
+        if (groupMemberCheck) {
+            myGroups.push(group)
+        }
+    }
+
+    if (myGroups.length <= 0) throw new Error('Ви не є учасником жодної зі спільнот')
+    return myGroups
 }
 export const getGroupService = async (groupId) => {
     const group = await GroupSchema.findById(groupId)

@@ -3,9 +3,9 @@ import {
     createCommentService,
     createGroupPostService,
     createGroupService,
-    followGroupService, getCommentsService,
+    followGroupService, getAllGroupsService, getCommentsService,
     getGroupService,
-    getMembersService,
+    getMembersService, getMyGroupsService,
     getOnePostService,
     getPostsService,
     likeGroupCommentService,
@@ -18,7 +18,7 @@ export const createGroupController = async (req, res) => {
         const {refreshToken} = req.cookies
         const avatar = req.files.avatar
         const background = req.files.background
-        const group = await createGroupService(title, refreshToken, avatar, background)
+        const group = await createGroupService(title, refreshToken, avatar.data, background.data)
         return res.status(200).json(group)
     } catch (e) {
         return res.status(400).json(e.message)
@@ -53,6 +53,23 @@ export const createGroupPostController = async (req, res) => {
         const groupId = req.params.id
         const groupPost = await createGroupPostService(groupId, refreshToken, text, image)
         return res.status(200).json(groupPost)
+    } catch (e) {
+        return res.status(400).json(e.message)
+    }
+}
+export const getAllGroupsController = async (req, res) => {
+    try {
+        const groups = await getAllGroupsService()
+        return res.status(200).json(groups)
+    } catch (e) {
+        return res.status(400).json(e.message)
+    }
+}
+export const getMyGroupsController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const groups = await getMyGroupsService(refreshToken)
+        return res.status(200).json(groups)
     } catch (e) {
         return res.status(400).json(e.message)
     }
