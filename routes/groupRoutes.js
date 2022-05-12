@@ -5,7 +5,7 @@ import {
     createGroupController,
     createGroupPostController,
     followGroupController, getAllGroupsController, getCommentsController,
-    getGroupController,
+    getGroupController, getGroupPostLikeController, getLimitedGroupsController,
     getMembersController, getMyGroupsController, getOnePostController,
     getPostsController,
     likeGroupCommentController,
@@ -25,11 +25,13 @@ router.post('/group/:id/:postId/comment/:commentId/like', likeGroupCommentContro
 router.post('/group/:id/messages/send', sendGroupMessageController)
 
 router.get('/groups', getAllGroupsController)
+router.get('/limitedGroups', getLimitedGroupsController)
 router.get('/myGroups', getMyGroupsController)
 router.get('/group/:id', getGroupController)
 router.get('/group/:id/members', getMembersController)
 router.get('/group/:id/posts/get', getPostsController)
 router.get('/group/:id/posts/:postId', getOnePostController)
+router.get('/group/:id/post/:postId/like/get', getGroupPostLikeController)
 router.get('/group/:id/:postId/comments/get', getCommentsController)
 router.get('/group/:id/messages/get', receiveGroupMessagesController)
 

@@ -3,8 +3,8 @@ import {
     createCommentService,
     createGroupPostService,
     createGroupService,
-    followGroupService, getAllGroupsService, getCommentsService,
-    getGroupService,
+    followGroupService, getAllGroupsService, getCommentsService, getGroupPostLikeService,
+    getGroupService, getLimitedGroupsService,
     getMembersService, getMyGroupsService,
     getOnePostService,
     getPostsService,
@@ -47,11 +47,11 @@ export const followGroupController = async(req, res) => {
 }
 export const createGroupPostController = async (req, res) => {
     try {
-        const {text} = req.body
+        const {text, location} = req.body
         const image = req?.files?.image
         const {refreshToken} = req.cookies
         const groupId = req.params.id
-        const groupPost = await createGroupPostService(groupId, refreshToken, text, image)
+        const groupPost = await createGroupPostService(groupId, refreshToken, text, location, image?.data)
         return res.status(200).json(groupPost)
     } catch (e) {
         return res.status(400).json(e.message)
@@ -61,6 +61,15 @@ export const getAllGroupsController = async (req, res) => {
     try {
         const groups = await getAllGroupsService()
         return res.status(200).json(groups)
+    } catch (e) {
+        return res.status(400).json(e.message)
+    }
+}
+export const getLimitedGroupsController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const {groups, groupMembers} = await getLimitedGroupsService(refreshToken)
+        return res.status(200).json({groups, groupMembers})
     } catch (e) {
         return res.status(400).json(e.message)
     }
@@ -109,6 +118,17 @@ export const getOnePostController = async (req, res) => {
         return res.status(200).json(post)
     } catch (e) {
         return res.status(400).json(e.message)
+    }
+}
+export const getGroupPostLikeController = async (req, res) => {
+    try {
+        const groupId = req.params.id
+        const postId = req.params.postId
+        const {refreshToken} = req.cookies
+        const like = await getGroupPostLikeService(groupId, postId, refreshToken)
+        return res.status(200).json(like)
+    } catch (e) {
+        res.status(400).json(e.message)
     }
 }
 export const createCommentController = async (req, res) => {

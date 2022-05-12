@@ -64,7 +64,7 @@ export const followGroupService = async (refreshToken, groupId) => {
     }
 
 }
-export const createGroupPostService = async (groupId, refreshToken, text, image) => {
+export const createGroupPostService = async (groupId, refreshToken, text, location, image) => {
     if (!text) throw new Error('Поля не можуть бути порожніми')
     const group = await GroupSchema.findById(groupId)
     if (!group) throw new Error('Спільноту не знайдено')
@@ -72,13 +72,36 @@ export const createGroupPostService = async (groupId, refreshToken, text, image)
     const userData = await validateRefreshToken(refreshToken);
     if (!userData) throw new Error('Користувача не знайдено')
     if (group.creatorId != userData._id) throw new Error('Ви не маєте права для створення нового поста')
-    const groupPost = await GroupPostsSchema.create({groupId, userId: userData._id, text, image})
+    const groupPost = await GroupPostsSchema.create({groupId, userId: userData._id, text})
+    if (image) {
+        await GroupPostsSchema.updateOne({_id: groupPost._id, groupId}, {
+            image
+        })
+    }
+    if (location) {
+        await GroupPostsSchema.updateOne({_id: groupPost._id, groupId}, {
+            location
+        })
+    }
     return groupPost
 }
 export const getAllGroupsService = async () => {
     const groups = await GroupSchema.find()
     if (!groups) throw new Error('Спільноту не знайдено')
     return groups
+}
+export const getLimitedGroupsService = async (refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const groups = await GroupSchema.find({creatorId: {$ne: userData._id}}).limit(5).sort({_id: -1})
+    if (!groups) throw new Error('Спільноту не знайдено')
+    const groupMembers = await GroupMembersSchema.find()
+    if (!groupMembers) throw new Error('В спільноті ніхто не знаходиться')
+    return {
+        groups,
+        groupMembers
+    }
 }
 export const getMyGroupsService = async (refreshToken) => {
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
@@ -111,7 +134,7 @@ export const getMembersService = async (groupId) => {
 export const getPostsService = async (groupId) => {
     const group = await GroupSchema.findById(groupId)
     if (!group) throw new Error('Спільноту не знайдено')
-    const posts = await GroupPostsSchema.find({groupId})
+    const posts = await GroupPostsSchema.find({groupId}).sort({_id: -1})
     if (!posts) throw new Error('В спільноті немає постів')
     return posts
 }
@@ -201,6 +224,13 @@ export const likeGroupCommentService = async (groupId, postId, commentId, refres
         await comment.save()
         return like
     }
+}
+export const getGroupPostLikeService = async (groupId, postId, refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const like = await GroupPostLikesSchema.findOne({groupId, postId, userId: userData._id})
+    return like
 }
 export const getCommentsService = async (groupId, postId) => {
     const group = await GroupSchema.findById(groupId)

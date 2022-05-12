@@ -7,6 +7,7 @@ const GroupPostsSchema = new Schema({
     text:{type:String, required:true},
     image:{data: Buffer,
         contentType: String},
+    location:{type:String},
     likes:{type:Number, default:0},
     comments:{type:Number, default:0},
     createdAt:{type:Date, default:new Date()}
