@@ -3,10 +3,10 @@ import {
     createCommentService,
     createGroupPostService,
     createGroupService,
-    followGroupService, getAllGroupsService, getCommentsService, getGroupPostLikeService,
+    followGroupService, getAllGroupsService, getChildGroupCommentsService, getCommentsService, getGroupPostLikeService,
     getGroupService, getLimitedGroupsService,
     getMembersService, getMyGroupsService,
-    getOnePostService,
+    getOnePostService, getParentGroupCommentsService,
     getPostsService,
     likeGroupCommentService,
     likeGroupPostService, receiveGroupMessagesService, sendGroupMessageService, setAdminService
@@ -207,6 +207,27 @@ export const receiveGroupMessagesController = async (req, res) => {
         const groupId = req.params.id
         const groupConversation = await receiveGroupMessagesService(refreshToken, groupId)
         return res.status(200).json(groupConversation)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const getParentGroupCommentsController = async (req, res) => {
+    try {
+        const groupId = req.params.id
+        const postId = req.params.postId
+        const comments = await getParentGroupCommentsService(groupId, postId)
+        return res.status(200).json(comments)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const getChildGroupCommentsController = async (req, res) => {
+    try {
+        const groupId = req.params.id
+        const postId = req.params.postId
+        const parentId = req.params.commentId
+        const comments = await getChildGroupCommentsService(groupId, postId, parentId)
+        return res.status(200).json(comments)
     } catch (e) {
         res.status(400).json(e.message)
     }

@@ -4,9 +4,9 @@ import {
     createCommentController,
     createGroupController,
     createGroupPostController,
-    followGroupController, getAllGroupsController, getCommentsController,
+    followGroupController, getAllGroupsController, getChildGroupCommentsController, getCommentsController,
     getGroupController, getGroupPostLikeController, getLimitedGroupsController,
-    getMembersController, getMyGroupsController, getOnePostController,
+    getMembersController, getMyGroupsController, getOnePostController, getParentGroupCommentsController,
     getPostsController,
     likeGroupCommentController,
     likeGroupPostController, receiveGroupMessagesController, sendGroupMessageController, setAdminController
@@ -33,6 +33,10 @@ router.get('/group/:id/posts/get', getPostsController)
 router.get('/group/:id/posts/:postId', getOnePostController)
 router.get('/group/:id/post/:postId/like/get', getGroupPostLikeController)
 router.get('/group/:id/:postId/comments/get', getCommentsController)
+
+router.get('/group/:id/post/:postId/comments/parent', getParentGroupCommentsController)
+router.get('/group/:id/post/:postId/comments/:commentId/child', getChildGroupCommentsController)
+
 router.get('/group/:id/messages/get', receiveGroupMessagesController)
 
 export default router

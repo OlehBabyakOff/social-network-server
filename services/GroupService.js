@@ -154,7 +154,7 @@ export const createCommentService = async (groupId, refreshToken, postId, conten
     if (!userData) throw new Error('Користувача не знайдено')
     const post = await GroupPostsSchema.findOne({_id: postId, groupId})
     if (!post) throw new Error('Пост не знайдено')
-    const comment = await GroupCommentSchema.create({groupId, postId:post._id, userId: userData._id, content})
+    const comment = await GroupCommentSchema.create({groupId, postId:post._id, userId: userData._id, content, createdAt: new Date()})
     post.comments += 1
     post.save()
     return comment
@@ -170,7 +170,7 @@ export const createChildCommentService = async (groupId, refreshToken, postId, p
     if (!post) throw new Error('Пост не знайдено')
     const parent = await GroupCommentSchema.findById(parentId)
     if (!parent) throw new Error('Батьківський коментар не знайдено')
-    const comment = await GroupCommentSchema.create({groupId,  postId:post._id, userId: userData._id, parentId, content})
+    const comment = await GroupCommentSchema.create({groupId,  postId:post._id, userId: userData._id, parentId, content, createdAt: new Date()})
     parent.childs.push(comment._id)
     await parent.save()
     post.comments += 1
@@ -281,4 +281,18 @@ export const receiveGroupMessagesService = async (refreshToken, groupId) => {
     const groupConversation = await GroupConversationSchema.findOne({groupId})
     if (!groupConversation) throw new Error('Такого чату не існує')
     return groupConversation
+}
+export const getParentGroupCommentsService = async (groupId, postId) => {
+    const post = await GroupPostsSchema.findOne({_id: postId, groupId})
+    if (!post) throw new Error('Пост не знайдено')
+    const comments = await GroupCommentSchema.find({groupId, postId:post._id, parentId: {$exists:false}}).sort({_id: -1})
+    if (!comments) throw new Error('Коментарі не знайдено')
+    return comments
+}
+export const getChildGroupCommentsService = async (groupId, postId, parentId) => {
+    const post = await GroupPostsSchema.findOne({_id: postId, groupId})
+    if (!post) throw new Error('Пост не знайдено')
+    const comments = await GroupCommentSchema.find({groupId, postId:post._id, parentId: parentId})
+    if (!comments) throw new Error('Коментарі не знайдено')
+    return comments
 }
