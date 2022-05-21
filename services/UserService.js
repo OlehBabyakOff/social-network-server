@@ -108,7 +108,7 @@ export const sendReportService = async (refreshToken, accusedId, violation) => {
     if (userData._id == accusedId) throw new Error('Ви не можете поскаржитись на самого себе')
     if (accused.roles.isAdmin) throw new Error('Ви не можете поскаржитись на адміністратора')
     const reportedBefore = await ReportsSchema.find({reporterId: userData._id, accusedId})
-    if (reportedBefore) throw new Error('Ви вже скаржилися на даного користувача')
+    if (reportedBefore.length > 0) throw new Error('Ви вже скаржилися на даного користувача')
     const report = await ReportsSchema.create({reporterId:userData._id, accusedId, violation})
     const autoCheck = await ReportsSchema.find({accusedId})
     if (autoCheck.length >= 5) {
