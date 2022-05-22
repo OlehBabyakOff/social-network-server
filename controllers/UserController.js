@@ -1,5 +1,6 @@
 import {
-    followToUserService,
+    createConversationService,
+    followToUserService, getConversationService,
     getFollowersService,
     getFollowingsService, getLimitedUsersService, getReportsService,
     getUserService, getUsersService, receiveMessageService, sendMessageService, sendReportService
@@ -59,13 +60,32 @@ export const getFollowingsController = async (req, res) => {
         res.status(400).json(e.message)
     }
 }
+export const createConversationController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const receiverId = req.params.id
+        const conversation = await createConversationService(refreshToken, receiverId)
+        return res.status(200).json(conversation)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
 export const sendMessageController = async (req, res) => {
     try {
         const {refreshToken} = req.cookies
         const receiverId = req.params.id
         const {text} = req.body
         const image = req?.files?.image
-        const conversation = await sendMessageService(refreshToken, receiverId, text, image)
+        const conversation = await sendMessageService(refreshToken, receiverId, text, image?.data)
+        return res.status(200).json(conversation)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const getConversationController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const conversation = await getConversationService(refreshToken)
         return res.status(200).json(conversation)
     } catch (e) {
         res.status(400).json(e.message)

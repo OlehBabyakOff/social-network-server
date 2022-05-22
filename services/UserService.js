@@ -57,8 +57,25 @@ export const getFollowingsService = async (userId) => {
     return followings
 }
 // messages
+export const createConversationService = async (refreshToken, receiverId) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    if (userData._id === receiverId) throw new Error('Ви не можете надсилати повідомлення самому собі')
+    const conversation = await ConversationSchema.findOne({
+        $or:[{participant1:userData._id, participant2: receiverId}, {participant2: userData._id, participant1:receiverId}]
+    })
+    if (conversation) {
+        return conversation
+    } else {
+        const newConversation = await ConversationSchema.create({participant1:userData._id, participant2:receiverId})
+        return newConversation
+    }
+}
+
 export const sendMessageService = async (refreshToken, receiverId, text, image) => {
-    if (!text) throw new Error('Поле не може бути порожнім')
+    console.log(image)
+    if (!text && !image) throw new Error('Повідомлення не може бути порожнім')
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
     const userData = await validateRefreshToken(refreshToken);
     if (!userData) throw new Error('Користувача не знайдено')
@@ -68,27 +85,35 @@ export const sendMessageService = async (refreshToken, receiverId, text, image) 
     })
     if (conversation) {
         if (image) {
-            conversation.messages.push({text:text, image:image, sender:userData._id})
+            conversation.messages.push({text:text, image:image, sender:userData._id, createdAt: new Date()})
             await conversation.save()
             return conversation
         } else {
-            conversation.messages.push({text:text, sender:userData._id})
+            conversation.messages.push({text:text, sender:userData._id, createdAt: new Date()})
             await conversation.save()
             return conversation
         }
     } else {
         if (image) {
             const newConversation = await ConversationSchema.create({participant1:userData._id, participant2:receiverId})
-            newConversation.messages.push({text:text, image: image, sender:userData._id})
+            newConversation.messages.push({text:text, image: image, sender:userData._id, createdAt: new Date()})
             await newConversation.save()
             return newConversation
         } else {
             const newConversation = await ConversationSchema.create({participant1:userData._id, participant2:receiverId})
-            newConversation.messages.push({text:text, sender:userData._id})
+            newConversation.messages.push({text:text, sender:userData._id, createdAt: new Date()})
             await newConversation.save()
             return newConversation
         }
     }
+}
+export const getConversationService = async (refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const conversation = await ConversationSchema.find({$or:[{participant2: userData._id}, {participant1:userData._id}]})
+    if (!conversation) throw new Error('Такого чату не існує')
+    return conversation
 }
 export const receiveMessageService = async (refreshToken, receiverId) => {
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')

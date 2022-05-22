@@ -8,7 +8,8 @@ const ConversationSchema = new Schema({
         text:{type:String, max: 2000},
         image:{data: Buffer,
             contentType: String},
-        sender:{type:Schema.Types.ObjectId, ref:'User'}
+        sender:{type:Schema.Types.ObjectId, ref:'User'},
+        createdAt: {type:Date, default:new Date()}
     }],
 })
 

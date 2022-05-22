@@ -43,13 +43,13 @@ io.on('connection', (socket) => {
     })
 
     socket.on('sendMessage', data => {
-        socket.to(data.room).emit('receiveMessage', data)
+        const [msg, id] = data
+        socket.broadcast.to(id).emit('receiveMessage', msg)
     })
 
-    socket.on('sendLocation', (data) => {
-        io.emit('locationMessage', {
-            data
-        })
+    socket.on('sendLocation', data => {
+        const [msg, id] = data
+        socket.broadcast.to(id).emit('locationMessage', msg)
     })
 
     socket.on('leaveRoom', roomId => {

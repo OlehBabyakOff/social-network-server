@@ -1,6 +1,7 @@
 import {Router} from "express"
 import {
-    followToUserController,
+    createConversationController,
+    followToUserController, getConversationController,
     getFollowersController,
     getFollowingsController, getLimitedUsersController, getReportsController,
     getUserController, getUsersController, receiveMessageController, sendMessageController, sendReportController
@@ -10,6 +11,7 @@ import {isActivate, isAdmin, isAuth, isBlocked} from "../middleware/authMiddlewa
 const router = new Router()
 
 router.post('/user/:id/follow', followToUserController)
+router.post('/user/:id/messages/create', createConversationController)
 router.post('/user/:id/messages/send', sendMessageController)
 router.post('/user/:id/report', sendReportController)
 
@@ -18,6 +20,7 @@ router.get('/limitedUsers', getLimitedUsersController)
 router.get('/user/:id', getUserController)
 router.get('/user/:id/followers', getFollowersController)
 router.get('/user/:id/followings', getFollowingsController)
+router.get('/user/conversations/get', getConversationController)
 router.get('/user/:id/messages/get', receiveMessageController)
 router.get('/user/:id/reports', getReportsController)
 export default router
