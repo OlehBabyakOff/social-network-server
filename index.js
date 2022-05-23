@@ -45,6 +45,7 @@ io.on('connection', (socket) => {
     socket.on('sendMessage', data => {
         const [msg, id] = data
         socket.broadcast.to(id).emit('receiveMessage', msg)
+        socket.broadcast.to(id).emit('messageNotification')
     })
 
     socket.on('sendLocation', data => {

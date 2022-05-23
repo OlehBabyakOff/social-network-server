@@ -3,6 +3,7 @@ import FollowerSchema from "../models/Followers.js";
 import ConversationSchema from "../models/Conversation.js";
 import ReportsSchema from "../models/Report.js";
 import {validateRefreshToken} from "./TokenService.js";
+import GallerySchema from "../models/Gallery.js";
 
 export const getUserService = async (userId) => {
     const user = await UserSchema.findById(userId)
@@ -146,4 +147,18 @@ export const getReportsService = async (accusedId) => {
     if (!accusedId) throw new Error('Користувача не знайдено')
     const reports = await ReportsSchema.find({accusedId})
     return reports
+}
+export const addGalleryService = async (refreshToken, image) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const gallery = await GallerySchema.create({userId: userData._id})
+    const photo = await GallerySchema.updateOne({_id: gallery._id}, {
+        image
+    })
+    return photo
+}
+export const getGalleryService = async (id) => {
+    const gallery = await GallerySchema.find({userId: id})
+    return gallery
 }

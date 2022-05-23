@@ -1,8 +1,9 @@
 import {
+    addGalleryService,
     createConversationService,
     followToUserService, getConversationService,
     getFollowersService,
-    getFollowingsService, getLimitedUsersService, getReportsService,
+    getFollowingsService, getGalleryService, getLimitedUsersService, getReportsService,
     getUserService, getUsersService, receiveMessageService, sendMessageService, sendReportService
 } from "../services/UserService.js";
 
@@ -117,6 +118,25 @@ export const getReportsController = async (req, res) => {
         const accusedId = req.params.id
         const reports = await getReportsService(accusedId)
         return res.status(200).json(reports)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const addGalleryController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const image = req.files.image
+        const gallery = await addGalleryService(refreshToken, image.data)
+        return res.status(200).json(gallery)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const getGalleryController = async (req, res) => {
+    try {
+        const id = req.params.id
+        const gallery = await getGalleryService(id)
+        return res.status(200).json(gallery)
     } catch (e) {
         res.status(400).json(e.message)
     }
