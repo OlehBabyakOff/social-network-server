@@ -159,6 +159,13 @@ export const addGalleryService = async (refreshToken, image) => {
     return photo
 }
 export const getGalleryService = async (id) => {
-    const gallery = await GallerySchema.find({userId: id})
+    const gallery = await GallerySchema.find({userId: id}).sort({_id: -1})
+    return gallery
+}
+export const deleteGalleryService = async (refreshToken, id) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const gallery = await GallerySchema.findOneAndDelete({_id: id, userId: userData._id})
     return gallery
 }

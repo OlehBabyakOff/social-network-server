@@ -12,6 +12,7 @@ import authRoutes from "./routes/authRoutes.js";
 import postRoutes from "./routes/postRoutes.js";
 import userRoutes from "./routes/userRoutes.js";
 import groupRoutes from "./routes/groupRoutes.js";
+import adminRoutes from "./routes/adminRoutes.js";
 
 const app = express()
 
@@ -24,7 +25,7 @@ app.use(fileUpload())
 app.use(cookieParser())
 app.use(bodyParser.json())
 
-app.use('/api', authRoutes, postRoutes, userRoutes, groupRoutes)
+app.use('/api', authRoutes, postRoutes, userRoutes, groupRoutes, adminRoutes)
 
 const server = http.createServer(app)
 const io = new Server(server, {
@@ -45,7 +46,6 @@ io.on('connection', (socket) => {
     socket.on('sendMessage', data => {
         const [msg, id] = data
         socket.broadcast.to(id).emit('receiveMessage', msg)
-        socket.broadcast.to(id).emit('messageNotification')
     })
 
     socket.on('sendLocation', data => {

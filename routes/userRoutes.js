@@ -1,7 +1,7 @@
 import {Router} from "express"
 import {
     addGalleryController,
-    createConversationController,
+    createConversationController, deleteGalleryController,
     followToUserController, getConversationController,
     getFollowersController,
     getFollowingsController, getGalleryController, getLimitedUsersController, getReportsController,
@@ -26,4 +26,7 @@ router.get('/user/conversations/get', getConversationController)
 router.get('/user/:id/messages/get', receiveMessageController)
 router.get('/user/:id/reports', getReportsController)
 router.get('/user/:id/gallery', getGalleryController)
+
+router.delete('/user/gallery/:id/delete', deleteGalleryController)
+
 export default router

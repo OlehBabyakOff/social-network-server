@@ -1,6 +1,6 @@
 import {
     addGalleryService,
-    createConversationService,
+    createConversationService, deleteGalleryService,
     followToUserService, getConversationService,
     getFollowersService,
     getFollowingsService, getGalleryService, getLimitedUsersService, getReportsService,
@@ -136,6 +136,16 @@ export const getGalleryController = async (req, res) => {
     try {
         const id = req.params.id
         const gallery = await getGalleryService(id)
+        return res.status(200).json(gallery)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const deleteGalleryController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const id = req.params.id
+        const gallery = await deleteGalleryService(refreshToken, id)
         return res.status(200).json(gallery)
     } catch (e) {
         res.status(400).json(e.message)
