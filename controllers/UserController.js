@@ -4,7 +4,7 @@ import {
     followToUserService, getConversationService,
     getFollowersService,
     getFollowingsService, getGalleryService, getLimitedUsersService, getReportsService,
-    getUserService, getUsersService, receiveMessageService, sendMessageService, sendReportService
+    getUserService, getUsersService, receiveMessageService, sendMessageService, sendReportService, updateInfoService
 } from "../services/UserService.js";
 
 export const getUserController = async (req, res) => {
@@ -147,6 +147,16 @@ export const deleteGalleryController = async (req, res) => {
         const id = req.params.id
         const gallery = await deleteGalleryService(refreshToken, id)
         return res.status(200).json(gallery)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const updateInfoController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const {email, username, first_name, second_name, phone} = req.body
+        const user = await updateInfoService(refreshToken, email, username, first_name, second_name, phone)
+        return res.status(200).json(user)
     } catch (e) {
         res.status(400).json(e.message)
     }

@@ -1,14 +1,22 @@
 import {Router} from "express"
 import {isActivate, isAdmin, isAuth, isBlocked} from "../middleware/authMiddleware.js";
 import {
+    allowBanUserController, banUserController, denyBanUserController,
     getGroupPostsController,
     getGroupsController,
     getPostsController,
     getReportsController,
-    getUsersController
+    getUsersController, setAdminController, unAdminController, unbanUserController
 } from "../controllers/AdminController.js";
 
 const router = new Router()
+
+router.post('/admin/:reporterId/:accusedId/ban', allowBanUserController)
+router.post('/admin/:reporterId/:accusedId/deny', denyBanUserController)
+router.post('/admin/:userId/ban', banUserController)
+router.post('/admin/:userId/unban', unbanUserController)
+router.post('/admin/:userId/setAdmin', setAdminController)
+router.post('/admin/:userId/unAdmin', unAdminController)
 
 router.get('/admin/users', getUsersController)
 router.get('/admin/groups', getGroupsController)

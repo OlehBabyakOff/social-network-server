@@ -1,11 +1,21 @@
 import {Router} from "express"
 import {
     addGalleryController,
-    createConversationController, deleteGalleryController,
-    followToUserController, getConversationController,
+    createConversationController,
+    deleteGalleryController,
+    followToUserController,
+    getConversationController,
     getFollowersController,
-    getFollowingsController, getGalleryController, getLimitedUsersController, getReportsController,
-    getUserController, getUsersController, receiveMessageController, sendMessageController, sendReportController
+    getFollowingsController,
+    getGalleryController,
+    getLimitedUsersController,
+    getReportsController,
+    getUserController,
+    getUsersController,
+    receiveMessageController,
+    sendMessageController,
+    sendReportController,
+    updateInfoController
 } from "../controllers/UserController.js";
 import {isActivate, isAdmin, isAuth, isBlocked} from "../middleware/authMiddleware.js";
 
@@ -26,6 +36,8 @@ router.get('/user/conversations/get', getConversationController)
 router.get('/user/:id/messages/get', receiveMessageController)
 router.get('/user/:id/reports', getReportsController)
 router.get('/user/:id/gallery', getGalleryController)
+
+router.put('/user/updateInfo', updateInfoController)
 
 router.delete('/user/gallery/:id/delete', deleteGalleryController)
 

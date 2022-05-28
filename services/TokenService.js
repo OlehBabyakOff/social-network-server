@@ -2,7 +2,7 @@ import TokenSchema from "../models/Token.js";
 import jwt from "jsonwebtoken";
 
 export const generateToken = async (payload) => {
-    const accessToken = await jwt.sign(payload, process.env.JWT_ACCESS, {expiresIn: '15m'})
+    const accessToken = await jwt.sign(payload, process.env.JWT_ACCESS, {expiresIn: '15d'})
     const refreshToken = await jwt.sign(payload, process.env.JWT_REFRESH, {expiresIn: '30d'})
     return {
         accessToken,
