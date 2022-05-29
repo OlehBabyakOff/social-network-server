@@ -2,14 +2,26 @@ import {
     createChildCommentService,
     createCommentService,
     createGroupPostService,
-    createGroupService,
-    followGroupService, getAllGroupsService, getChildGroupCommentsService, getCommentsService, getGroupPostLikeService,
-    getGroupService, getLimitedGroupsService,
-    getMembersService, getMyGroupsService,
-    getOnePostService, getParentGroupCommentsService,
+    createGroupService, deleteGroupService,
+    followGroupService,
+    getAllGroupsService,
+    getChildGroupCommentsService,
+    getCommentsService,
+    getGroupPostLikeService,
+    getGroupService,
+    getLimitedGroupsService,
+    getMembersService,
+    getMyGroupsService,
+    getOnePostService,
+    getParentGroupCommentsService,
     getPostsService,
     likeGroupCommentService,
-    likeGroupPostService, receiveGroupMessagesService, sendGroupMessageService, setAdminService
+    likeGroupPostService,
+    receiveGroupMessagesService,
+    sendGroupMessageService,
+    setAdminService,
+    updateGroupAvatarService, updateGroupBgService,
+    updateGroupInfoService
 } from "../services/GroupService.js";
 
 export const createGroupController = async (req, res) => {
@@ -228,6 +240,49 @@ export const getChildGroupCommentsController = async (req, res) => {
         const parentId = req.params.commentId
         const comments = await getChildGroupCommentsService(groupId, postId, parentId)
         return res.status(200).json(comments)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const updateGroupInfoController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const groupId = req.params.groupId
+        const {title} = req.body
+        const group = await updateGroupInfoService(refreshToken, groupId, title)
+        return res.status(200).json(group)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const updateGroupAvatarController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const groupId = req.params.groupId
+        const avatar = req.files.avatar
+        const group = await updateGroupAvatarService(refreshToken, groupId, avatar.data)
+        return res.status(200).json(group)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const updateGroupBgController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const groupId = req.params.groupId
+        const background = req.files.background
+        const group = await updateGroupBgService(refreshToken, groupId, background.data)
+        return res.status(200).json(group)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const deleteGroupController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const groupId = req.params.groupId
+        const group = await deleteGroupService(refreshToken, groupId)
+        return res.status(200).json(group)
     } catch (e) {
         res.status(400).json(e.message)
     }

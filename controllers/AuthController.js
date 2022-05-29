@@ -15,7 +15,7 @@ export const registrationController = async (req, res) => {
         res.cookie('refreshToken', user.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true })
         return res.status(201).json({user, message: "Ви успішно зареєструвались"})
     } catch (e) {
-        res.status(401).json(e.message)
+        return res.status(401).json(e.message)
     }
 }
 export const loginController = async (req, res) => {
@@ -25,7 +25,7 @@ export const loginController = async (req, res) => {
         res.cookie('refreshToken', user.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
         return res.status(201).json({user, message: "Ви успішно увійшли до акаунту"})
     } catch (e) {
-        res.status(401).json(e.message)
+        return res.status(401).json(e.message)
     }
 }
 export const logoutController = async (req, res) => {
@@ -35,7 +35,7 @@ export const logoutController = async (req, res) => {
         res.clearCookie('refreshToken')
         res.status(201).json({token, message: "Ви вийшли з акаунту"})
     } catch (e) {
-        res.status(401).json(e.message)
+        return res.status(401).json(e.message)
     }
 }
 export const activateController = async (req, res) => {

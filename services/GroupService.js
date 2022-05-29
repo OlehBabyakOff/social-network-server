@@ -296,3 +296,59 @@ export const getChildGroupCommentsService = async (groupId, postId, parentId) =>
     if (!comments) throw new Error('Коментарі не знайдено')
     return comments
 }
+export const updateGroupInfoService = async (refreshToken, groupId, title) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const group = await GroupSchema.findOne({_id: groupId})
+    if (userData._id.toString() === group.creatorId.toString()) {
+        const groupUpdate = await GroupSchema.findOneAndUpdate({_id: groupId}, {
+            title
+        })
+        return groupUpdate
+    } else {
+        throw new Error('Ви не є адміністратором групи')
+    }
+}
+export const updateGroupAvatarService = async (refreshToken, groupId, avatar) => {
+    if (!avatar) throw new Error('Дані порожні')
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const group = await GroupSchema.findOne({_id: groupId})
+    if (userData._id.toString() === group.creatorId.toString()) {
+        const groupUpdate = await GroupSchema.findOneAndUpdate({_id: groupId}, {
+            avatar
+        })
+        return groupUpdate
+    } else {
+        throw new Error('Ви не є адміністратором групи')
+    }
+}
+export const updateGroupBgService = async (refreshToken, groupId, background) => {
+    if (!background) throw new Error('Дані порожні')
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const group = await GroupSchema.findOne({_id: groupId})
+    if (userData._id.toString() === group.creatorId.toString()) {
+        const groupUpdate = await GroupSchema.findOneAndUpdate({_id: groupId}, {
+            background
+        })
+        return groupUpdate
+    } else {
+        throw new Error('Ви не є адміністратором групи')
+    }
+}
+export const deleteGroupService = async (refreshToken, groupId) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const group = await GroupSchema.findOne({_id: groupId})
+    if (userData._id.toString() === group.creatorId.toString()) {
+        const groupDelete = await GroupSchema.findOneAndDelete({_id: groupId})
+        return groupDelete
+    } else {
+        throw new Error('Ви не є адміністратором групи')
+    }
+}

@@ -1,10 +1,21 @@
 import {
     addGalleryService,
-    createConversationService, deleteGalleryService,
-    followToUserService, getConversationService,
+    createConversationService,
+    deleteGalleryService,
+    followToUserService,
+    getConversationService,
     getFollowersService,
-    getFollowingsService, getGalleryService, getLimitedUsersService, getReportsService,
-    getUserService, getUsersService, receiveMessageService, sendMessageService, sendReportService, updateInfoService
+    getFollowingsService,
+    getGalleryService,
+    getLimitedUsersService,
+    getReportsService,
+    getUserService,
+    getUsersService,
+    receiveMessageService,
+    sendMessageService,
+    sendReportService,
+    updateAvatarService, updateBgService,
+    updateInfoService
 } from "../services/UserService.js";
 
 export const getUserController = async (req, res) => {
@@ -156,6 +167,26 @@ export const updateInfoController = async (req, res) => {
         const {refreshToken} = req.cookies
         const {email, username, first_name, second_name, phone} = req.body
         const user = await updateInfoService(refreshToken, email, username, first_name, second_name, phone)
+        return res.status(200).json(user)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const updateAvatarController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const avatar = req.files.avatar
+        const user = await updateAvatarService(refreshToken, avatar.data)
+        return res.status(200).json(user)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const updateBgController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const background = req.files.background
+        const user = await updateBgService(refreshToken, background.data)
         return res.status(200).json(user)
     } catch (e) {
         res.status(400).json(e.message)

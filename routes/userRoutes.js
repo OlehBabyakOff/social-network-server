@@ -14,7 +14,7 @@ import {
     getUsersController,
     receiveMessageController,
     sendMessageController,
-    sendReportController,
+    sendReportController, updateAvatarController, updateBgController,
     updateInfoController
 } from "../controllers/UserController.js";
 import {isActivate, isAdmin, isAuth, isBlocked} from "../middleware/authMiddleware.js";
@@ -38,6 +38,8 @@ router.get('/user/:id/reports', getReportsController)
 router.get('/user/:id/gallery', getGalleryController)
 
 router.put('/user/updateInfo', updateInfoController)
+router.put('/user/updateAvatar', updateAvatarController)
+router.put('/user/updateBackground', updateBgController)
 
 router.delete('/user/gallery/:id/delete', deleteGalleryController)
 

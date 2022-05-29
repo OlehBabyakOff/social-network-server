@@ -182,3 +182,23 @@ export const updateInfoService = async (refreshToken, email, username, first_nam
     })
     return user
 }
+export const updateAvatarService = async (refreshToken, avatar) => {
+    if (!avatar) throw new Error('Дані порожні')
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const user = await UserSchema.findOneAndUpdate({_id: userData._id}, {
+        avatar
+    })
+    return user
+}
+export const updateBgService = async (refreshToken, background) => {
+    if (!background) throw new Error('Дані порожні')
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const user = await UserSchema.findOneAndUpdate({_id: userData._id}, {
+        background
+    })
+    return user
+}
