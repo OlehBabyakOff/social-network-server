@@ -2,7 +2,7 @@ import {
     createChildCommentService,
     createCommentService,
     createGroupPostService,
-    createGroupService, deleteGroupService,
+    createGroupService, deleteGroupCommentService, deleteGroupPostService, deleteGroupService,
     followGroupService,
     getAllGroupsService,
     getChildGroupCommentsService,
@@ -283,6 +283,29 @@ export const deleteGroupController = async (req, res) => {
         const groupId = req.params.groupId
         const group = await deleteGroupService(refreshToken, groupId)
         return res.status(200).json(group)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const deleteGroupPostController = async (req, res) => {
+    try {
+        const groupId = req.params.groupId
+        const postId = req.params.postId
+        const {refreshToken} = req.cookies
+        const post = await deleteGroupPostService(groupId, postId, refreshToken)
+        return res.status(200).json(post)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const deleteGroupCommentController = async (req, res) => {
+    try {
+        const groupId = req.params.groupId
+        const postId = req.params.postId
+        const commentId = req.params.commentId
+        const {refreshToken} = req.cookies
+        const post = await deleteGroupCommentService(groupId, postId, commentId, refreshToken)
+        return res.status(200).json(post)
     } catch (e) {
         res.status(400).json(e.message)
     }

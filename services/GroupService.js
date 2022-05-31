@@ -72,7 +72,7 @@ export const createGroupPostService = async (groupId, refreshToken, text, locati
     const userData = await validateRefreshToken(refreshToken);
     if (!userData) throw new Error('Користувача не знайдено')
     if (group.creatorId != userData._id) throw new Error('Ви не маєте права для створення нового поста')
-    const groupPost = await GroupPostsSchema.create({groupId, userId: userData._id, text})
+    const groupPost = await GroupPostsSchema.create({groupId, userId: userData._id, text, createdAt: Date.now()})
     if (image) {
         await GroupPostsSchema.updateOne({_id: groupPost._id, groupId}, {
             image
@@ -116,7 +116,7 @@ export const getMyGroupsService = async (refreshToken) => {
         }
     }
 
-    if (myGroups.length <= 0) throw new Error('Ви не є учасником жодної зі спільнот')
+    // if (myGroups.length <= 0) throw new Error('Ви не є учасником жодної зі спільнот')
     return myGroups
 }
 export const getGroupService = async (groupId) => {
@@ -350,5 +350,39 @@ export const deleteGroupService = async (refreshToken, groupId) => {
         return groupDelete
     } else {
         throw new Error('Ви не є адміністратором групи')
+    }
+}
+export const deleteGroupPostService = async (groupId, postId, refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const group = await GroupSchema.findOne({_id: groupId})
+    const post = await GroupPostsSchema.findOne({_id: postId, groupId: group._id})
+    if (!post) throw new Error('Пост не знайдено')
+    if (post.userId.toString() === userData._id.toString() || userData.roles.isAdmin) {
+        await GroupPostsSchema.findOneAndDelete({_id: postId})
+        return {message: 'Пост успішно видалено'}
+    } else {
+        throw new Error('Ви не можете видалити чужий пост')
+    }
+}
+export const deleteGroupCommentService = async (groupId, postId, commentId, refreshToken) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const group = await GroupSchema.findOne({_id: groupId})
+    const post = await GroupPostsSchema.findOne({_id: postId, groupId: group._id})
+    if (!post) throw new Error('Пост не знайдено')
+    const comment = await GroupCommentSchema.findOne({_id: commentId, groupId: groupId, postId: postId})
+    if (!comment) throw new Error('Коментар не знайдено')
+    if (comment.userId.toString() === userData._id.toString() || userData.roles.isAdmin) {
+        await GroupCommentSchema.findOneAndDelete({_id: commentId, groupId: groupId, postId: postId})
+        const deletedComments = await GroupCommentSchema.deleteMany({parentId: commentId})
+        await GroupPostsSchema.findOneAndUpdate({_id: postId}, {
+            comments: post.comments - 1 - deletedComments.deletedCount
+        })
+        return {message: 'Коментар успішно видалено'}
+    } else {
+        throw new Error('Ви не можете видалити чужий коментар')
     }
 }

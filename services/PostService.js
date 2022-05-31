@@ -9,7 +9,7 @@ export const createPostService = async (refreshToken, text, location, image) => 
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
     const userData = await validateRefreshToken(refreshToken)
     if (!userData) throw new Error('Користувача не знайдено')
-    const post = await PostSchema.create({user: userData._id, text})
+    const post = await PostSchema.create({user: userData._id, text, createdAt: Date.now()})
     if (image) {
         await PostSchema.updateOne({_id: post._id}, {
             image

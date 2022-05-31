@@ -3,7 +3,7 @@ import {
     createChildCommentController,
     createCommentController,
     createGroupController,
-    createGroupPostController, deleteGroupController,
+    createGroupPostController, deleteGroupCommentController, deleteGroupController, deleteGroupPostController,
     followGroupController,
     getAllGroupsController,
     getChildGroupCommentsController,
@@ -54,5 +54,7 @@ router.put('/group/:groupId/updateAvatar', updateGroupAvatarController)
 router.put('/group/:groupId/updateBackground', updateGroupBgController)
 
 router.delete('/group/:groupId/delete', deleteGroupController)
+router.delete('/group/:groupId/delete/:postId', deleteGroupPostController)
+router.delete('/group/:groupId/:postId/comment/:commentId/delete', deleteGroupCommentController)
 
 export default router
