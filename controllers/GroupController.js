@@ -14,7 +14,7 @@ import {
     getMyGroupsService,
     getOnePostService,
     getParentGroupCommentsService,
-    getPostsService,
+    getPostsService, kickUserService,
     likeGroupCommentService,
     likeGroupPostService,
     receiveGroupMessagesService,
@@ -306,6 +306,17 @@ export const deleteGroupCommentController = async (req, res) => {
         const {refreshToken} = req.cookies
         const post = await deleteGroupCommentService(groupId, postId, commentId, refreshToken)
         return res.status(200).json(post)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
+export const kickUserController = async (req, res) => {
+    try {
+        const groupId = req.params.groupId
+        const userId = req.params.userId
+        const {refreshToken} = req.cookies
+        const user = await kickUserService(refreshToken, groupId, userId)
+        return res.status(200).json(user)
     } catch (e) {
         res.status(400).json(e.message)
     }

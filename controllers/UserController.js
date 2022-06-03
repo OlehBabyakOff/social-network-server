@@ -7,7 +7,7 @@ import {
     getFollowersService,
     getFollowingsService,
     getGalleryService,
-    getLimitedUsersService,
+    getLimitedUsersService, getOneConversationService,
     getReportsService,
     getUserService,
     getUsersService,
@@ -85,10 +85,10 @@ export const createConversationController = async (req, res) => {
 export const sendMessageController = async (req, res) => {
     try {
         const {refreshToken} = req.cookies
-        const receiverId = req.params.id
+        const conversationId = req.params.id
         const {text} = req.body
         const image = req?.files?.image
-        const conversation = await sendMessageService(refreshToken, receiverId, text, image?.data)
+        const conversation = await sendMessageService(refreshToken, conversationId, text, image?.data)
         return res.status(200).json(conversation)
     } catch (e) {
         res.status(400).json(e.message)
@@ -103,11 +103,21 @@ export const getConversationController = async (req, res) => {
         res.status(400).json(e.message)
     }
 }
+export const getOneConversationController = async (req, res) => {
+    try {
+        const {refreshToken} = req.cookies
+        const conversationId = req.params.conversationId
+        const conversation = await getOneConversationService(refreshToken, conversationId)
+        return res.status(200).json(conversation)
+    } catch (e) {
+        res.status(400).json(e.message)
+    }
+}
 export const receiveMessageController = async (req, res) => {
     try {
         const {refreshToken} = req.cookies
-        const receiverId = req.params.id
-        const conversation = await receiveMessageService(refreshToken, receiverId)
+        const conversationId = req.params.id
+        const conversation = await receiveMessageService(refreshToken, conversationId)
         return res.status(200).json(conversation)
     } catch (e) {
         res.status(400).json(e.message)

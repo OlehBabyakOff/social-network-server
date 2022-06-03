@@ -4,6 +4,7 @@ import ConversationSchema from "../models/Conversation.js";
 import ReportsSchema from "../models/Report.js";
 import {validateRefreshToken} from "./TokenService.js";
 import GallerySchema from "../models/Gallery.js";
+import ConversationMessagesSchema from "../models/ConversationMessages.js";
 
 export const getUserService = async (userId) => {
     const user = await UserSchema.findById(userId)
@@ -74,38 +75,19 @@ export const createConversationService = async (refreshToken, receiverId) => {
     }
 }
 
-export const sendMessageService = async (refreshToken, receiverId, text, image) => {
-    console.log(image)
+export const sendMessageService = async (refreshToken, conversationId, text, image) => {
     if (!text && !image) throw new Error('Повідомлення не може бути порожнім')
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
     const userData = await validateRefreshToken(refreshToken);
     if (!userData) throw new Error('Користувача не знайдено')
-    if (userData._id === receiverId) throw new Error('Ви не можете надсилати повідомлення самому собі')
-    const conversation = await ConversationSchema.findOne({
-        $or:[{participant1:userData._id, participant2: receiverId}, {participant2: userData._id, participant1:receiverId}]
-    })
-    if (conversation) {
-        if (image) {
-            conversation.messages.push({text:text, image:image, sender:userData._id, createdAt: new Date()})
-            await conversation.save()
-            return conversation
-        } else {
-            conversation.messages.push({text:text, sender:userData._id, createdAt: new Date()})
-            await conversation.save()
-            return conversation
-        }
+    const conversation = await ConversationSchema.findOne({_id: conversationId})
+    const message = await ConversationMessagesSchema.create({conversation: conversation._id, text: text, sender: userData._id, createdAt: Date.now()})
+    if (image) {
+        await ConversationMessagesSchema.findOneAndUpdate({_id: message._id}, {image})
+        const imageMsg = await ConversationMessagesSchema.findOne({_id: message._id})
+        return imageMsg
     } else {
-        if (image) {
-            const newConversation = await ConversationSchema.create({participant1:userData._id, participant2:receiverId})
-            newConversation.messages.push({text:text, image: image, sender:userData._id, createdAt: new Date()})
-            await newConversation.save()
-            return newConversation
-        } else {
-            const newConversation = await ConversationSchema.create({participant1:userData._id, participant2:receiverId})
-            newConversation.messages.push({text:text, sender:userData._id, createdAt: new Date()})
-            await newConversation.save()
-            return newConversation
-        }
+        return message
     }
 }
 export const getConversationService = async (refreshToken) => {
@@ -116,13 +98,22 @@ export const getConversationService = async (refreshToken) => {
     if (!conversation) throw new Error('Такого чату не існує')
     return conversation
 }
-export const receiveMessageService = async (refreshToken, receiverId) => {
+export const getOneConversationService = async (refreshToken, conversationId) => {
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
     const userData = await validateRefreshToken(refreshToken);
     if (!userData) throw new Error('Користувача не знайдено')
-    const conversation = await ConversationSchema.findOne({$or:[{participant1:receiverId, participant2: userData._id}, {participant1:userData._id, participant2:receiverId}]})
+    const conversation = await ConversationSchema.findOne({_id: conversationId})
     if (!conversation) throw new Error('Такого чату не існує')
     return conversation
+}
+export const receiveMessageService = async (refreshToken, conversationId) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const conversation = await ConversationSchema.findOne({_id: conversationId})
+    if (!conversation) throw new Error('Такого чату не існує')
+    const messages = await ConversationMessagesSchema.find({conversation: conversation._id})
+    return messages
 }
 // reports
 export const sendReportService = async (refreshToken, accusedId, violation) => {

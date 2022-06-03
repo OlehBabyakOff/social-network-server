@@ -15,7 +15,7 @@ import {
     getMyGroupsController,
     getOnePostController,
     getParentGroupCommentsController,
-    getPostsController,
+    getPostsController, kickUserController,
     likeGroupCommentController,
     likeGroupPostController,
     receiveGroupMessagesController,
@@ -56,5 +56,6 @@ router.put('/group/:groupId/updateBackground', updateGroupBgController)
 router.delete('/group/:groupId/delete', deleteGroupController)
 router.delete('/group/:groupId/delete/:postId', deleteGroupPostController)
 router.delete('/group/:groupId/:postId/comment/:commentId/delete', deleteGroupCommentController)
+router.delete('/group/:groupId/:userId/kick', kickUserController)
 
 export default router

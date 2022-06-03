@@ -8,7 +8,7 @@ import {
     getFollowersController,
     getFollowingsController,
     getGalleryController,
-    getLimitedUsersController,
+    getLimitedUsersController, getOneConversationController,
     getReportsController,
     getUserController,
     getUsersController,
@@ -33,6 +33,7 @@ router.get('/user/:id', getUserController)
 router.get('/user/:id/followers', getFollowersController)
 router.get('/user/:id/followings', getFollowingsController)
 router.get('/user/conversations/get', getConversationController)
+router.get('/user/conversation/:conversationId/get', getOneConversationController)
 router.get('/user/:id/messages/get', receiveMessageController)
 router.get('/user/:id/reports', getReportsController)
 router.get('/user/:id/gallery', getGalleryController)

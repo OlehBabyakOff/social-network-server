@@ -36,7 +36,7 @@ const io = new Server(server, {
 })
 
 io.on('connection', (socket) => {
-    console.log(`User ${socket.id} connected`)
+    // console.log(`User ${socket.id} connected`)
 
     socket.on('joinRoom', roomId => {
         socket.join(roomId)
@@ -44,22 +44,20 @@ io.on('connection', (socket) => {
     })
 
     socket.on('sendMessage', data => {
-        const [msg, id] = data
-        socket.broadcast.to(id).emit('receiveMessage', msg)
+        socket.to(data.conversation).emit('receiveMessage', data)
     })
 
     socket.on('sendLocation', data => {
-        const [msg, id] = data
-        socket.broadcast.to(id).emit('locationMessage', msg)
+        socket.to(data.conversation).emit('locationMessage', data)
     })
 
     socket.on('leaveRoom', roomId => {
         socket.leave(roomId)
-        console.log(`User ${socket.id} left room ${roomId}`)
+        // console.log(`User ${socket.id} left room ${roomId}`)
     })
 
     socket.on('disconnect', () => {
-        console.log(`User ${socket.id} disconnected`)
+        // console.log(`User ${socket.id} disconnected`)
     })
 })
 

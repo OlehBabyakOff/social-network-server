@@ -386,3 +386,15 @@ export const deleteGroupCommentService = async (groupId, postId, commentId, refr
         throw new Error('Ви не можете видалити чужий коментар')
     }
 }
+export const kickUserService = async (refreshToken, groupId, userId) => {
+    if (!refreshToken) throw new Error('Токен авторизації не дійсний')
+    const userData = await validateRefreshToken(refreshToken);
+    if (!userData) throw new Error('Користувача не знайдено')
+    const group = await GroupSchema.findOne({_id: groupId})
+    if (userData._id.toString() === group.creatorId.toString()) {
+        const kickUser = await GroupMembersSchema.findOneAndDelete({groupId, memberId: userId})
+        return kickUser
+    } else {
+        throw new Error('Ви не являєтесь адміністратором спільноти')
+    }
+}
