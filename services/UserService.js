@@ -160,7 +160,7 @@ export const deleteGalleryService = async (refreshToken, id) => {
     const gallery = await GallerySchema.findOneAndDelete({_id: id, userId: userData._id})
     return gallery
 }
-export const updateInfoService = async (refreshToken, email, username, first_name, second_name, phone) => {
+export const updateInfoService = async (refreshToken, email, username, first_name, second_name, phone, birthday) => {
     if (!refreshToken) throw new Error('Токен авторизації не дійсний')
     const userData = await validateRefreshToken(refreshToken);
     if (!userData) throw new Error('Користувача не знайдено')
@@ -169,7 +169,8 @@ export const updateInfoService = async (refreshToken, email, username, first_nam
         username,
         first_name,
         second_name,
-        phone
+        phone,
+        birthday
     })
     return user
 }

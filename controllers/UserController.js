@@ -175,8 +175,8 @@ export const deleteGalleryController = async (req, res) => {
 export const updateInfoController = async (req, res) => {
     try {
         const {refreshToken} = req.cookies
-        const {email, username, first_name, second_name, phone} = req.body
-        const user = await updateInfoService(refreshToken, email, username, first_name, second_name, phone)
+        const {email, username, first_name, second_name, phone, birthday} = req.body
+        const user = await updateInfoService(refreshToken, email, username, first_name, second_name, phone, birthday)
         return res.status(200).json(user)
     } catch (e) {
         res.status(400).json(e.message)

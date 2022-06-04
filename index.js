@@ -53,7 +53,7 @@ io.on('connection', (socket) => {
 
     socket.on('leaveRoom', roomId => {
         socket.leave(roomId)
-        // console.log(`User ${socket.id} left room ${roomId}`)
+        console.log(`User ${socket.id} left room ${roomId}`)
     })
 
     socket.on('disconnect', () => {
