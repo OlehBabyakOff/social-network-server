@@ -51,13 +51,13 @@ export const logoutService = async (refreshToken) => {
     return token
 }
 export const activateService = async (activationLink) => {
-
     const candidate = await UserSchema.findOne({activationLink})
     if (candidate.roles.isActivated) throw new Error('Ваш акаунт вже активовано')
 
     const user = await UserSchema.findOneAndUpdate({activationLink},{"roles.isActivated": true}, {new:true})
     if (!user) throw new Error('Посилання не дійсне')
-    await user.save
+    await user.save()
+    return user
 }
 export const refreshService = async (refreshToken) => {
     if (!refreshToken) throw new Error('Токен не існує')

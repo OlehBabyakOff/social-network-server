@@ -42,9 +42,9 @@ export const activateController = async (req, res) => {
     try {
         const activationLink = req.params.link
         await activateService(activationLink)
-        return res.status(201).json({message: "Ваш акаунт успішно активований"}).redirect(`http://localhost:3000/`)
+        return res.status(201)
     } catch (e) {
-        res.status(401).json(e.message)
+        return res.status(401).json(e.message)
     }
 }
 export const refreshController = async (req, res) => {
@@ -54,6 +54,7 @@ export const refreshController = async (req, res) => {
         res.cookie('refreshToken', user.refreshToken, {maxAge: 30 * 24 * 60 * 60 * 1000, httpOnly: true})
         return res.status(201).json(user)
     } catch (e) {
-        res.status(400).json(e.message)
+        res.clearCookie('refreshToken')
+        return res.status(400).json(e.message)
     }
 }
