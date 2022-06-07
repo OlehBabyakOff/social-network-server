@@ -1,5 +1,4 @@
 import {Router} from "express"
-import {isActivate, isAdmin, isAuth, isBlocked} from "../middleware/authMiddleware.js";
 import {
     allowBanUserController, banUserController, denyBanUserController,
     getGroupPostsController,

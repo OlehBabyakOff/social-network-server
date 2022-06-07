@@ -17,7 +17,6 @@ import {
     sendReportController, updateAvatarController, updateBgController,
     updateInfoController
 } from "../controllers/UserController.js";
-import {isActivate, isAdmin, isAuth, isBlocked} from "../middleware/authMiddleware.js";
 
 const router = new Router()
 
