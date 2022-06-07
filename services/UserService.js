@@ -126,7 +126,7 @@ export const sendReportService = async (refreshToken, accusedId, violation) => {
     if (accused.roles.isAdmin) throw new Error('Ви не можете поскаржитись на адміністратора')
     const reportedBefore = await ReportsSchema.find({reporterId: userData._id, accusedId})
     if (reportedBefore.length > 0) throw new Error('Ви вже скаржилися на даного користувача')
-    const report = await ReportsSchema.create({reporterId:userData._id, accusedId, violation})
+    const report = await ReportsSchema.create({reporterId:userData._id, accusedId, violation, reportedAt: Date.now()})
     const autoCheck = await ReportsSchema.find({accusedId})
     if (autoCheck.length >= 5) {
         const autoBan = await UserSchema.findOneAndUpdate({_id:accusedId},{"roles.isBlocked":true}, {new:true})

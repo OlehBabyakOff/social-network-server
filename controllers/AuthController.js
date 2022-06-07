@@ -42,7 +42,7 @@ export const activateController = async (req, res) => {
     try {
         const activationLink = req.params.link
         await activateService(activationLink)
-        return res.status(201)
+        return res.status(201).redirect('http://localhost:3000')
     } catch (e) {
         return res.status(401).json(e.message)
     }

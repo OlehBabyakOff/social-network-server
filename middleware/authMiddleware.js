@@ -12,10 +12,8 @@ export const isAuth = async (req, res, next) => {
         if (!userData) return next(res.status(401).json('Ви не авторизовані'))
 
         req.user = userData
-        console.log('auth')
         next()
     } catch (e) {
-        console.log(e.message)
         return next(res.status(401).json('Ви не авторизовані'))
     }
 }
